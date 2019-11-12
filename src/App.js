@@ -46,7 +46,8 @@ class App extends Component {
       input: '',
       imageUrl: '',
       route: 'signin',
-      isSignedin: false
+      isSignedin: false,
+      predRes: ''
     }
   }
 
@@ -62,21 +63,20 @@ class App extends Component {
     }
     this.setState({route: route});
   }
-
+  // let result = response.outputs[0].data.concepts[0].name;
+  // console.log(this.state.input);
+  // //console.log(this.state.predRes);
+  // this.setState({predRes: result});
+  // function(err) {
+  //   
+  // }
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});
     app.models.predict(
       Clarifai.MODERATION_MODEL,
       this.state.input)
-    .then(
-    function(response) {
-      console.log(response.outputs[0].data.concepts[0].name)
-      console.log(response.outputs[0].data.concepts[0])
-    },
-    function(err) {
-      alert("There are some problems with your URL. Please check it again")
-    }
-  );
+    .then(response => this.setState({predRes: response.outputs[0].data.concepts[0].name}))
+    .catch(err => alert("There are some problems with your URL. Please check it again"));
   }
 
   render() {
@@ -90,7 +90,7 @@ class App extends Component {
         {this.state.route === 'home' 
         ? <div>
           <Logo/>
-          <Rank/>
+          <Rank predRes={this.state.predRes}/>
           <ImageLinkForm 
             onInputChange={this.onInputChange} 
             onButtonSubmit={this.onButtonSubmit}/>
